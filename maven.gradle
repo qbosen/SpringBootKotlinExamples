@@ -35,7 +35,7 @@ ext {
                 repositories {
                     maven {
                         if (isRelease) {//正式版,发布到正式服务器上
-                            url = "http://192.168.6.120:8181/repository/maven-release/"
+                            url = "http://192.168.6.120:8181/repository/maven-releases/"
                             credentials { username 'deployment'; password '123456' }
                         } else {//开发版，发布到内网服务器上
                             url = "http://192.168.6.120:8181/repository/maven-snapshots/"
