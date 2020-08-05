@@ -1,0 +1,51 @@
+buildscript {
+    repositories {
+        maven { url "http://192.168.6.120:8181/repository/maven-public/" }
+    }
+}
+ext {
+    getMavenVersion = { isRelease ->
+        def version = "1.0-SNAPSHOT"
+        if (isRelease) {
+            def now = Calendar.instance
+            version = "${now.get(Calendar.YEAR) - 2019}.${now.get(Calendar.MONTH) + 1}.${now.get(Calendar.DATE)}"
+        }
+        return version
+    }
+    applyMaven = { projectName, isRelease ->
+        project(projectName) {
+
+            apply plugin: "maven-publish"
+            task sourceJar(type: Jar) {
+                from sourceSets.main.java
+            }
+
+            publishing {
+                publications {
+                    mavenJava(MavenPublication) {
+                        from components.java
+
+                        if (!isRelease) {
+                            artifact sourceJar {
+                                classifier "sources"
+                            }
+                        }
+                    }
+                }
+                repositories {
+                    maven {
+                        if (isRelease) {//正式版,发布到正式服务器上
+                            url = "http://192.168.6.120:8181/repository/maven-release/"
+                            credentials { username 'deployment'; password '123456' }
+                        } else {//开发版，发布到内网服务器上
+                            url = "http://192.168.6.120:8181/repository/maven-snapshots/"
+                            credentials { username 'deployment'; password '123456' }
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+}

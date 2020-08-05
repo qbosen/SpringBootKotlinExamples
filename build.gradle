@@ -1,0 +1,40 @@
+def isRelease = false
+apply from: 'maven.gradle'
+
+allprojects {
+    group 'top.abosen.example'
+    apply plugin: 'java'
+    version getMavenVersion(isRelease)
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+    repositories {
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+        maven { url "http://192.168.6.120:8181/repository/maven-public/" }
+        mavenCentral()
+    }
+}
+
+subprojects {
+    ext {
+        springbootVersion = "2.3.2.RELEASE"
+        springDependencyMgrVersion = "1.0.9.RELEASE"
+        kotlinVersion = "1.3.72"
+    }
+
+    def projectName = project.name.replace("-", ".")
+    archivesBaseName = project.group + '.' + projectName
+
+    dependencies {
+        //依赖本地jar
+        implementation fileTree(dir: 'libs', include: '**/*.jar')
+        implementation fileTree(dir: new File(rootProject.rootDir, 'libs').getAbsolutePath(), include: '**/*.jar')
+    }
+}
+
+
+[':base'].each {
+    applyMaven(it, isRelease)
+}

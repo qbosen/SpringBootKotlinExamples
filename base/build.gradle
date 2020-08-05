@@ -1,0 +1,55 @@
+plugins {
+    id 'idea'
+    id "org.springframework.boot" version "$springbootVersion"
+    id "io.spring.dependency-management" version "$springDependencyMgrVersion"
+    id "org.jetbrains.kotlin.jvm" version "$kotlinVersion"
+    id "org.jetbrains.kotlin.kapt" version "$kotlinVersion"
+    id "org.jetbrains.kotlin.plugin.spring" version "$kotlinVersion"
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+jar{
+    enabled = true
+}
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/java'
+    main.compileClasspath += files('config')
+    test.kotlin.srcDirs += 'src/test/java'
+    test.java.srcDirs += 'src/test/java'
+    test.compileClasspath += files('config')
+}
+
+idea {
+    module {
+        resourceDirs += file('config')
+    }
+}
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(group: "org.junit.vintage", module: "junit-vintage-engine")
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+task prepareKotlinBuildScriptModel {
+}
